@@ -66,7 +66,7 @@ export default {
     }
   },
   methods: {
-    install(data, opacity = 0.1) {
+    install(data) {
       return new Promise(function(resolve, reject) {
         let idObject = document.getElementById(domId);
         if (idObject != null)
