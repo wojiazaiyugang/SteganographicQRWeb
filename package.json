@@ -5,11 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "element-ui": "^2.15.1",
+    "konva": "^7.2.5",
+    "vue": "^2.6.11",
+    "vue-konva": "^2.1.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
