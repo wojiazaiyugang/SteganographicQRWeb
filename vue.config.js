@@ -6,7 +6,7 @@ function resolve(dir) {
 
 module.exports = {
     // 输出文件目录
-    outputDir: 'docs',
+    outputDir: 'dist',
     assetsDir: 'assets', // 静态资源目录 (js, css, img, fonts)
     publicPath: '/',
     lintOnSave: false,
