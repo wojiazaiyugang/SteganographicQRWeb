@@ -19,6 +19,24 @@
         <input type="file" @change="selectFile" accept="image/*"></input>
         <el-button @click="pretreatment" style="margin-top: 20px;">下一步</el-button>
       </el-tab-pane>
+      <el-tab-pane label="解码说明" name="instruction">
+        <div style="display: flex;flex-direction: column;align-items: center">
+          1、拖动四个顶点在原图上框选出一个矩形,注意：<br>
+          1)选取的矩形要求在原始图片/屏幕中也是一个矩形<br>
+          2)所选取的矩形区域尽可能大<br>
+          3)注意四个顶点的顺序
+          <img style="width: 500px;height: auto" src="./1.jpg" />
+          2、拖动两个顶点标记一个色块的对角点<br>
+          1)注意两个顶点的顺序<br>
+          2)不同图片色块区域可能有缺损，可以估计位置，<br>
+          但要保证不但标记出来的是一个完整的色块，所画出来的其它网格中也较好的匹配其它色块
+          <div style="display: flex">
+            <img style="width: 400px;height: auto" src="./2.jpg" />
+            <img style="width: 400px;height: auto" src="./3.jpg" />
+          </div>
+        </div>
+
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -49,7 +67,7 @@ export default {
   },
   data() {
     return {
-      activeName: "encode",
+      activeName: "instruction",
       data: "",
       file: null,
       opacity: 0.15,
@@ -319,6 +337,7 @@ export default {
   height: 100%;
   padding: 0px 20px;
   box-sizing: border-box;
+  overflow: auto;
 }
 
 .el-tabs__content {
