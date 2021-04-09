@@ -7,7 +7,8 @@
           <el-input v-model="data" style="width: 200px;margin-right: 20px;" placeholder="只支持整数"></el-input>
           不透明度(0-1，推荐小于0.3)：
           <el-input v-model="opacity" style="width: 80px;"></el-input>
-          <el-button style="margin-left: 20px;" type="primary" @click="encode">编码</el-button>
+          <el-button style="margin-left: 20px;" type="primary" @click="encode">加水印</el-button>
+          <el-button style="margin-left: 20px;" type="primary" @click="clear">去除水印</el-button>
         </div>
         <img style="height: 80%;width: auto;" src="./3.png"/>
       </el-tab-pane>
@@ -45,6 +46,7 @@
 const domId = "qr"
 export const server = "https://steganography.rosc.org.cn/api"
 // export const server = "http://127.0.0.1:5000"
+// export const server = "http://192.168.250.119:5000"
 import VueKonva from 'vue-konva'
 import axios from "axios"
 import {
@@ -85,17 +87,15 @@ export default {
   },
   methods: {
     install(data, opacity) {
-      return new Promise(function(resolve, reject) {
-        let idObject = document.getElementById(domId);
-        if (idObject != null)
-          idObject.parentNode.removeChild(idObject);
+      return new Promise((resolve, reject)=> {
+        this.clear()
         axios.get(`${server}/encode`, {
           params: {
             data: data
           }
         })
             .then((resp) => {
-              if (resp.data.code == 200) {
+              if (resp.data.code === 200) {
                 let div = document.createElement("div")
                 div.id = domId
                 div.style.opacity = opacity
@@ -116,6 +116,11 @@ export default {
               reject(err.toString())
             })
       })
+    },
+    clear() {
+      let idObject = document.getElementById(domId);
+      if (idObject != null)
+        idObject.parentNode.removeChild(idObject);
     },
     encode() {
       this.install(this.data, this.opacity).then(() => {
@@ -147,9 +152,6 @@ export default {
           width: this.stage.width(),
           height: this.stage.height()
         })
-        // konvaImage.cache()
-        // konvaImage.filters([Konva.Filters.Enhance])
-        // konvaImage.enhance(2)
         this.imageLayer.add(konvaImage)
         this.imageLayer.draw()
         this.initPoints1()
@@ -180,7 +182,7 @@ export default {
       if (!this.file) return
       let formData = new FormData()
       formData.append("image", this.file)
-      if (this.points2.length == 0) {
+      if (this.points2.length === 0) {
         this.appendPoints1(formData)
         axios.post(`${server}/pretreatment`, formData, {
           headers: {
@@ -188,7 +190,7 @@ export default {
           }
         })
             .then((resp) => {
-              if (resp.data.code != 200) {
+              if (resp.data.code !== 200) {
                 Message.error(resp.data.msg)
               } else {
                 this.imageLayer.removeChildren()
@@ -208,7 +210,7 @@ export default {
                 this.initPoints2()
               }
             })
-      } else if (this.points2.length == 2) {
+      } else if (this.points2.length === 2) {
         this.appendPoints1(formData)
         this.appendPoints2(formData)
         axios.post(`${server}/decode`, formData, {
@@ -217,7 +219,7 @@ export default {
           }
         })
             .then((resp) => {
-              if (resp.data.code != 200) {
+              if (resp.data.code !== 200) {
                 Message.error(resp.data.msg)
               } else {
                 Message.success(`解码成功:${resp.data.data}`)
