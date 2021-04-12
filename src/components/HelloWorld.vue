@@ -46,7 +46,6 @@
 const domId = "qr"
 export const server = "https://steganography.rosc.org.cn/api"
 // export const server = "http://127.0.0.1:5000"
-// export const server = "http://192.168.250.119:5000"
 import VueKonva from 'vue-konva'
 import axios from "axios"
 import {
@@ -72,6 +71,7 @@ export default {
       activeName: "instruction",
       data: "",
       file: null,
+      imageBase64: "",
       opacity: 0.15,
       konvaWidth: 1000,
       stage: null,
@@ -135,7 +135,8 @@ export default {
       let reader = new FileReader()
       reader.onload = (result) => {
         let image = new Image()
-        image.src = result.target.result
+        this.imageBase64 = result.target.result
+        image.src = this.imageBase64
         image.onload = () => {
           this.imageShape = [image.height, image.width]
         }
@@ -158,35 +159,37 @@ export default {
         this.updateLines()
       }
     },
-    appendPoints1(formData) {
+    appendPoints1(jsons) {
       let widthRatio = this.stage.width() / this.imageShape[1]
       let heightRatio = this.stage.height() / this.imageShape[0]
-      formData.append("x1", parseInt(this.points1[0].x() / widthRatio))
-      formData.append("y1", parseInt(this.points1[0].y() / heightRatio))
-      formData.append("x2", parseInt(this.points1[1].x() / widthRatio))
-      formData.append("y2", parseInt(this.points1[1].y() / heightRatio))
-      formData.append("x3", parseInt(this.points1[2].x() / widthRatio))
-      formData.append("y3", parseInt(this.points1[2].y() / heightRatio))
-      formData.append("x4", parseInt(this.points1[3].x() / widthRatio))
-      formData.append("y4", parseInt(this.points1[3].y() / heightRatio))
+      jsons["x1"] = parseInt(this.points1[0].x() / widthRatio)
+      jsons["y1"] =parseInt(this.points1[0].y() / heightRatio)
+      jsons["x2"]= parseInt(this.points1[1].x() / widthRatio)
+      jsons["y2"]= parseInt(this.points1[1].y() / heightRatio)
+      jsons["x3"]= parseInt(this.points1[2].x() / widthRatio)
+      jsons["y3"]= parseInt(this.points1[2].y() / heightRatio)
+      jsons["x4"]= parseInt(this.points1[3].x() / widthRatio)
+      jsons["y4"]= parseInt(this.points1[3].y() / heightRatio)
+      return jsons
     },
-    appendPoints2(formData) {
+    appendPoints2(jsons) {
       let widthRatio = this.stage.width() / this.imageBinaryShape[1]
       let heightRatio = this.stage.height() / this.imageBinaryShape[0]
-      formData.append("x5", parseInt(this.points2[0].x() / widthRatio))
-      formData.append("y5", parseInt(this.points2[0].y() / heightRatio))
-      formData.append("x6", parseInt(this.points2[1].x() / widthRatio))
-      formData.append("y6", parseInt(this.points2[1].y() / heightRatio))
+      jsons["x5"]= parseInt(this.points2[0].x() / widthRatio)
+      jsons["y5"]= parseInt(this.points2[0].y() / heightRatio)
+      jsons["x6"]= parseInt(this.points2[1].x() / widthRatio)
+      jsons["y6"]= parseInt(this.points2[1].y() / heightRatio)
+      return jsons
     },
     pretreatment() {
       if (!this.file) return
-      let formData = new FormData()
-      formData.append("image", this.file)
+      let jsons = {}
+      jsons["image"] = this.imageBase64
       if (this.points2.length === 0) {
-        this.appendPoints1(formData)
-        axios.post(`${server}/pretreatment`, formData, {
+        jsons = this.appendPoints1(jsons)
+        axios.post(`${server}/pretreatment/v2`, jsons, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           }
         })
             .then((resp) => {
@@ -211,11 +214,11 @@ export default {
               }
             })
       } else if (this.points2.length === 2) {
-        this.appendPoints1(formData)
-        this.appendPoints2(formData)
-        axios.post(`${server}/decode`, formData, {
+        jsons = this.appendPoints1(jsons)
+        jsons = this.appendPoints2(jsons)
+        axios.post(`${server}/decode/v2`, jsons, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           }
         })
             .then((resp) => {
